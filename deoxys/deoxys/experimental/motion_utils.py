@@ -224,3 +224,22 @@ def position_only_gripper_move_by(
         controller_cfg=controller_cfg,
         grasp=grasp,
     )
+
+
+def close_gripper(
+        robot_interface
+):
+    """
+    Closes the gripper
+    """
+    robot_interface.gripper_control(-0.1)
+
+
+def open_gripper(
+        robot_interface
+):
+    """
+    Opens the gripper
+    """
+    robot_interface.gripper_control(-1)
+
