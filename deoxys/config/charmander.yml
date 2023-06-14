@@ -1,9 +1,9 @@
 PC:
-  NAME: "rosie"
+  NAME: "albert"
   IP: 172.16.0.1
 
 NUC:
-  NAME: "charmander"
+  NAME: "viscam"
   IP: 172.16.0.3
   PUB_PORT: 5556
   SUB_PORT: 5555
