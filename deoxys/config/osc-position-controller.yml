@@ -7,17 +7,22 @@ traj_interpolator_cfg:
   time_fraction: 0.3
 
 # large Kp causes vibration, maybe rotation affects more
+#Kp:
+#  translation: [220.0, 220.0, 220.0]
+#  rotation: 280.0
 Kp:
-  translation: [170, 170.0, 170.0]
-  rotation: 260.0
+  translation: [210, 210.0, 210.0]
+  rotation: 280.0
 
 action_scale:
-  translation: 0.025
+  translation: 0.05
   rotation: 1.0
 
 #  [0.1, 0.2, 0.25, 0.30, 0.35, 1.0, 1.1]
 # [0.05, 0.15, 0.25, 0.30, 0.40, 0.8, 1.0]
-residual_mass_vec: [0.05, 0.15, 0.25, 0.30, 0.40, 0.8, 1.0]
+# [0.1, 0.2, 0.25, 0.40, 0.65, 1.3, 1.4]
+#  [0.05, 0.15, 0.25, 0.30, 0.40, 0.8, 1.0]s
+residual_mass_vec: [0.05, 0.10, 0.20, 0.30, 0.40, 0.7, 1.0]
 
 state_estimator_cfg:
   is_estimation: true
