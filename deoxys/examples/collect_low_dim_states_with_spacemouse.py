@@ -36,7 +36,7 @@ def parse_args():
         type=int,
         default=50734,
     )
-    parser.add_argument("--controller-type", type=str, default="OSC_POSE")
+    parser.add_argument("--controller-type", type=str, default="OSC_POSITION")
     parser.add_argument(
         "--controller-cfg", type=str, default="osc-position-controller.yml"
     )
@@ -75,10 +75,12 @@ def main():
         config_path = os.path.join(config_root, args.interface_cfg)
     else:
         config_path = args.interface_cfg
+
     robot_interface = FrankaInterface(config_path)
+    time.sleep(2)
+    assert robot_interface.last_q is not None, f"robot state not available, is the connection fine?"
 
     controller_type = args.controller_type
-
     controller_cfg = YamlConfig(
         os.path.join(config_root, args.controller_cfg)
     ).as_easydict()
@@ -95,9 +97,7 @@ def main():
 
     previous_state_dict = None
 
-    time.sleep(2)
-
-    while i < 2000:
+    while i < 20000:
         logger.info(i)
         i += 1
         start_time = time.time_ns()
@@ -131,9 +131,8 @@ def main():
             continue
 
         start = True
-        # print(action.shape)
-        # Record ee pose,  joints
 
+        # Record ee pose,  joints
         data["action"].append(action)
 
         state_dict = {
@@ -161,6 +160,7 @@ def main():
 
         end_time = time.time_ns()
         print(f"Time profile: {(end_time - start_time) / 10 ** 9}")
+
     os.makedirs(folder, exist_ok=True)
 
     with h5py.File(f"{folder}/recorded_trajecotry.hdf5", "w") as h5py_file:
@@ -179,6 +179,7 @@ def main():
     robot_interface.close()
     logger.info("Total length of the trajectory: {}".format(len(data["action"])))
     logger.info(f"The trajectory info is saved in {folder}/recorded_trajecotry.hdf5")
+
     valid_input = False
     while not valid_input:
         try:
@@ -189,7 +190,6 @@ def main():
             pass
     if not save:
         import shutil
-
         shutil.rmtree(f"{folder}")
 
 

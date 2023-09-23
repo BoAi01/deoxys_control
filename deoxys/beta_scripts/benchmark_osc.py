@@ -235,13 +235,13 @@ def main():
     # We test the following configurations, ranging from high-level trajectory planning to low level control hyperparameters
     # number of interplation steps
     num_exp = 1
-    num_steps_list = [40, 80, 120]
+    num_steps_list = [10, 20, 40]  # [40, 80, 120]
     num_additional_steps = 40
     traj_interpolation_fraction_list = [0.3]  # [0.3, 0.7, 1.0]
     K_list = [
         # (150.0, 250.0),
-        ([150.0, 150.0, 60.0], 250.0),
-        ([60.0, 150.0, 150.0], 250.0),
+        ([150.0, 150.0, 150.0], 250.0),
+        ([150.0, 150.0, 180.0], 250.0),
     ]
     reset_joint_positions = [
         0.09162008114028396,

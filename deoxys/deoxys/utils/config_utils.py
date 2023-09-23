@@ -99,6 +99,9 @@ def get_default_controller_config(controller_type: str) -> EasyDict:
             os.path.join(config_root, "joint-position-controller.yml")
         ).as_easydict()
         controller_cfg = verify_controller_config(controller_cfg)
+    else:
+        raise NotImplementedError()
+
     return controller_cfg
 
 

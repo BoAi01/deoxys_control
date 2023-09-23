@@ -43,6 +43,11 @@ def compute_errors(pose_1, pose_2):
 
 def osc_move(robot_interface, controller_type, controller_cfg, target_pose, num_steps):
     target_pos, target_quat = target_pose
+    assert isinstance(target_pos, np.ndarray) and target_pos.shape == (3, 1)
+
+    # print(target_quat)
+    # import pdb
+    # pdb.set_trace()
     target_axis_angle = transform_utils.quat2axisangle(target_quat)
     current_rot, current_pos = robot_interface.last_eef_rot_and_pos
 
@@ -58,8 +63,8 @@ def osc_move(robot_interface, controller_type, controller_cfg, target_pose, num_
         axis_angle_diff = transform_utils.quat2axisangle(quat_diff)
         action_pos = (target_pos - current_pos).flatten() * 10
         action_axis_angle = axis_angle_diff.flatten() * 1
-        action_pos = np.clip(action_pos, -1.0, 1.0)
-        action_axis_angle = np.clip(action_axis_angle, -0.5, 0.5)
+        action_pos = np.clip(action_pos, -0.3, 0.3)
+        action_axis_angle = np.clip(action_axis_angle, -0.2, 0.2)
 
         action = action_pos.tolist() + action_axis_angle.tolist() + [-1.0]
         logger.info(f"Axis angle action {action_axis_angle.tolist()}")
@@ -96,6 +101,7 @@ def move_to_target_pose(
     current_axis_angle = transform_utils.quat2axisangle(current_quat)
 
     target_pos = np.array(target_delta_pos).reshape(3, 1) + current_pos
+    logger.info(f"Current axis angle {current_axis_angle}")
 
     target_axis_angle = np.array(target_delta_axis_angle) + current_axis_angle
 
@@ -111,19 +117,15 @@ def move_to_target_pose(
 
     start_pose = current_pos.flatten().tolist() + current_quat.flatten().tolist()
 
+    # print(target_pos, target_quat)
+    # import pdb
+    # pdb.set_trace()
     osc_move(
         robot_interface,
         controller_type,
         controller_cfg,
         (target_pos, target_quat),
         num_steps,
-    )
-    osc_move(
-        robot_interface,
-        controller_type,
-        controller_cfg,
-        (target_pos, target_quat),
-        num_additional_steps,
     )
 
 
@@ -138,26 +140,51 @@ def main():
     controller_cfg = get_default_controller_config(controller_type)
 
     reset_joint_positions = [
-        0.09162008114028396,
-        -0.19826458111314524,
-        -0.01990020486871322,
-        -2.4732269941140346,
-        -0.01307073642274261,
-        2.30396583422025,
-        0.8480939705504309,
+        0.08535331703543622,
+        -0.5125424319854167,
+        -0.017850128697897035,
+        -2.369681038890256,
+        -0.01402637640800741,
+        1.8468557911292822,
+        0.8491329694317945
     ]
 
     reset_joints_to(robot_interface, reset_joint_positions)
+    ee_rot, current_pos = robot_interface.last_eef_rot_and_pos
+    print(ee_rot)
+    import time
 
     move_to_target_pose(
         robot_interface,
         controller_type,
         controller_cfg,
-        target_delta_pose=[0.2, 0.0, 0.0, 0.0, 0.5, 0.2],
+        target_delta_pose=[0.0, 0.0, 0.0, 0.0, 0.5 * np.pi * 2, 0.0],
         num_steps=80,
         num_additional_steps=40,
         interpolation_method="linear",
     )
+
+    # time.sleep(1)
+    # move_to_target_pose(
+    #     robot_interface,
+    #     controller_type,
+    #     controller_cfg,
+    #     target_delta_pose=[0.0, 0.0, 0.0, 0.0, -0.5 * np.pi * 2, 0.0],
+    #     num_steps=80,
+    #     num_additional_steps=40,
+    #     interpolation_method="linear",
+    # )
+
+    # original: np.array([ 0.9999675 ,  0.0051137 , -0.00565124,  0.00260889])
+    # second pose: np.array([ 0.55907772,  0.56289018, -0.00316337, -0.60875014])
+
+    # osc_move(robot_interface, "OSC_YAW", controller_cfg,
+    #          (np.array([[0.39], [-0.024], [0.41]]), np.array([0.55907772,  0.56289018, -0.00316337, -0.60875014])),
+    #          # ([0.39, -0.024, 0.41], np.array([0.55907772, 0.56289018, -0.00316337, -0.60875014])),
+    #          num_steps=80)
+
+    # ee_rot, current_pos = robot_interface.last_eef_rot_and_pos
+    # print(ee_rot)
 
     robot_interface.close()
 
